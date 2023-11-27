@@ -3,12 +3,7 @@ package assign10;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * This class contains generic static methods for finding the k largest items in a list.
- * 
- * @author Prof. Parker and ??
- * @version ??
- */
+c
 public class FindKLargest {
 	
 	/**
