@@ -37,21 +37,37 @@ public class BinaryMaxHeap<T> implements PriorityQueue<T>{
      * @param list - List of items
      */
     public BinaryMaxHeap(List<? extends T> list) {
+        binaryHeap = (T[]) new Object[list.size() + 1];
+        for (int i = 1; i <= list.size(); i++) {
+            binaryHeap[i] = list.get(i - 1);
+            count++;
+        }
+        cmp = null;
+        for (int i = count / 2; i > 0; i--)
+            percolateDown(i);
     }
 
 
     /**
-     *
+     * This constructor
      * @param list
      * @param cmp
      */
     public BinaryMaxHeap(List<? extends T> list, Comparator<? super T> cmp) {
+        this.cmp = cmp;
+        binaryHeap = (T[]) new Object[list.size() + 1];
+        for (int i = 1; i <= list.size(); i++) {
+            binaryHeap[i] = list.get(i - 1);
+            count++;
+        }
+        for (int i = count / 2; i > 0; i--)
+            percolateDown(i);
     }
 
 
     @Override
     public void add(T item) {
-        if (binaryHeap.length == count)
+        if (binaryHeap.length == count + 1)
             doubleHeapSize();
         if (count == 0)
             binaryHeap[1] = item;
@@ -69,16 +85,24 @@ public class BinaryMaxHeap<T> implements PriorityQueue<T>{
         return binaryHeap[1];
     }
 
+    /**
+     * Returns and removes the maximum item this priority queue.
+     * O(log N)
+     *
+     * @return the maximum item
+     * @throws NoSuchElementException if this priority queue is empty
+     */
     @Override
     public T extractMax() throws NoSuchElementException {
-        if (count == 0)
+        if (count == 0) {
             throw new NoSuchElementException();
+        }
 
+        count--;
         T temp = binaryHeap[1];
         binaryHeap[1] = binaryHeap[count + 1];
         binaryHeap[count + 1] = null;
         percolateDown(1);
-        count--;
         return temp;
     }
 
@@ -129,11 +153,16 @@ public class BinaryMaxHeap<T> implements PriorityQueue<T>{
         }
     }
 
+    /**
+     * This a process that ensures a heap is well formed.
+     * @param index - current index
+     */
     private void percolateDown(int index) {
         while (true) {
-            // If the right kids exist, and it is greater than the parents
-            if (2 * index + 1 <= count && comparable(binaryHeap[index], getRightKids(index)) < 0) {
-                if (comparable(getLeftKids(index), getRightKids(index)) > 0) {
+            // If the right child exist and greater than its parents
+            if (2 * index + 1 <= count && comparable(binaryHeap[index], getRightChild(index)) < 0) {
+                // Compare the size of left and right kids and swap with the parents
+                if (comparable(getLeftChild(index), getRightChild(index)) > 0) {
                     swap(index, 2 * index);
                     index = 2 * index;
                 } else {
@@ -141,22 +170,33 @@ public class BinaryMaxHeap<T> implements PriorityQueue<T>{
                     index = 2 * index + 1;
                 }
             }
-            // If the left child exist and there is no right child
-            else if (2 * index <= count && comparable(binaryHeap[index], getLeftKids(index)) < 0) {
+            // If the left child exist and greater than its parents swap witht he parents
+            else if (2 * index <= count && comparable(binaryHeap[index], getLeftChild(index)) < 0) {
                 swap(index, 2 * index);
                 index = 2 * index;
-            } else
+            } else {
                 break;
+            }
         }
     }
 
-    private T getRightKids(int index) {
+    /**
+     * This private method returns the value of the right child
+     * @param index - current index
+     * @return - right child index
+     */
+    private T getRightChild(int index) {
         if (binaryHeap[2 * index + 1] == null)
             return null;
         return binaryHeap[2 * index + 1];
     }
 
-    private T getLeftKids(int index) {
+    /**
+     * This private method returns the value of the left child
+     * @param index - current index
+     * @return - left child index
+     */
+    private T getLeftChild(int index) {
         if (binaryHeap[2 * index] == null)
             return null;
         return binaryHeap[2 * index];
@@ -181,10 +221,5 @@ public class BinaryMaxHeap<T> implements PriorityQueue<T>{
         T temp2 = binaryHeap[index2];
         binaryHeap[index2] = temp1;
         binaryHeap[index1] = temp2;
-    }
-
-    private void buildHeap() {
-        for (int i = count / 2; i > 0; i--)
-            percolateDown(i);
     }
 }
